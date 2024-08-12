@@ -4,7 +4,18 @@ const fs = require("fs");
 // We now need to read the file using fs and fs.createReadStream(path[, options])
 // found in node documentation , then register to event emitter
 
-const result = []; // initializing an empty array to store the received data from the stream
+const habitablePlanet = []; // initializing an empty array to store the received data from the stream
+// Creating a function that will filter out the  planets
+
+function isHabitablePlanet(planet) {
+  return (
+    planet["koi_disposition"] === "CONFIRMED" &&
+    planet["koi_insol"] > 0.36 &&
+    planet["koi_insol"] < 1.11 &&
+    planet["koi_prad"] < 1.6
+  );
+}
+
 fs.createReadStream("kepler_data.csv")
   //Here we really need to read data row by row as it come and in a readable way
   // and this is done by parse func. how to connect parse with the function createReadStream?
@@ -22,8 +33,10 @@ fs.createReadStream("kepler_data.csv")
     })
   )
   .on("data", (data) => {
-    // pushing data into the array
-    result.push(data);
+    // pushing data into the array if the planet is habitable
+    if (isHabitablePlanet(data)) {
+      habitablePlanet.push(data);
+    }
   })
   // we can add an emitter to catch the error by chaining
   .on("error", (error) => {
@@ -32,8 +45,7 @@ fs.createReadStream("kepler_data.csv")
 
   // End the stream when there is no more data/ the file is end
   .on("end", () => {
-    console.log(result);
-    console.log("No more data to read");
+    console.log(`${habitablePlanet.length} habitable planets found!`);
   });
 
 // Using the parse function that knows only EventEmitter. this function uses streaming
