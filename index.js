@@ -45,6 +45,14 @@ fs.createReadStream("kepler_data.csv")
 
   // End the stream when there is no more data/ the file is end
   .on("end", () => {
+    //   console.log(habitablePlanet); // this will show many planets we don't need exactly
+    //   let's loop through our array and see
+
+    console.log(
+      habitablePlanet.map((planet) => {
+        return planet["kepler_name"];
+      })
+    );
     console.log(`${habitablePlanet.length} habitable planets found!`);
   });
 
